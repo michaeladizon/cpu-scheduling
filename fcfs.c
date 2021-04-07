@@ -31,7 +31,6 @@ void fcfs(Process p[], int n) {
 	for(i = 0; i < n; i++)
 		tat[i] = wt[i] + p[i].bt;
 	
-	
 	for(i = 0; i < n; i++) {
 		// total waiting time
 		twt += wt[i];
@@ -43,92 +42,43 @@ void fcfs(Process p[], int n) {
 		printf("************************************\n");
 	}
 	
-	awt = (float)twt/3;
+	awt = (float)twt/n;
 	printf("Average waiting time: %.2f\n", awt);
 }
 
 int main() {
-	Process test1, test2, test3;
-	Process test4, test5, test6, test7, test8;
-	Process test9, test10, test11, test12, test13;
+	Process test1, test2, test3, test4, test5;
 	
-    //	0 3 1   --  fcfs - 3 processes - 1 (ignore - rr only)
-    //	0 0 24  --  id - at - bt
-    //	1 0 3   --  id - at - bt
-    //	2 0 3   --  id - at - bt
+    //	0 5 1   --  fcfs - 5 processes - 1 (ignore - rr only)
+    //	2 10 3  --  id - at - bt
+    //	3 1 3   --  id - at - bt
+    //	1 4 24  --  id - at - bt
+    //	4 0 2   --  id - at - bt
+    //	5 48 2  --  id - at - bt
 
-	test1.id = 0;
-	test1.at = 0;
-	test1.bt = 24;
+	test1.id = 2;
+	test1.at = 10;
+	test1.bt = 3;
 	
-	test2.id = 1;
-	test2.at = 0;
+	test2.id = 3;
+	test2.at = 1;
 	test2.bt = 3;
 	
-	test3.id = 2;
-	test3.at = 0;
-	test3.bt = 3;
+	test3.id = 1;
+	test3.at = 4;
+	test3.bt = 24;
 	
-    //	0 5 2
-    //	2 10 3
-    //	3 1 3
-    //	1 4 24
-    //	4 0 2
-    //	5 48 2
-
-	test4.id = 2;
-	test4.at = 10;
-	test4.bt = 3;
+	test4.id = 4;
+	test4.at = 0;
+	test4.bt = 2;
 	
-	test5.id = 3;
-	test5.at = 1;
-	test5.bt = 3;
+	test5.id = 5;
+	test5.at = 48;
+	test5.bt = 2;
 	
-	test6.id = 1;
-	test6.at = 4;
-	test6.bt = 24;
+	Process oop[5] = {test1, test2, test3, test4, test5};
 	
-	test7.id = 4;
-	test7.at = 0;
-	test7.bt = 2;
-	
-	test8.id = 5;
-	test8.at = 48;
-	test8.bt = 2;
-	
-    //1 2 6
-    //2 5 3
-    //3 1 8
-    //4 0 3
-    //5 4 4
-
-	test9.id = 1;
-	test9.at = 2;
-	test9.bt = 6;
-	
-	test10.id = 2;
-	test10.at = 5;
-	test10.bt = 3;
-	
-	test11.id = 3;
-	test11.at = 1;
-	test11.bt = 8;
-	
-	test12.id = 4;
-	test12.at = 0;
-	test12.bt = 3;
-	
-	test13.id = 5;
-	test13.at = 4;
-	test13.bt = 4;
-	
-	Process oop1[3] = {test1, test2, test3};
-	Process oop2[5] = {test4, test5, test6, test7, test8};
-	Process oop3[5] = {test9, test10, test11, test12, test13};
-	
-	fcfs(oop1, 3);
-//	fcfs(oop2, 5);
-//	fcfs(oop3, 5);
+	fcfs(oop, 5);
 	
 	return 0;
 }
