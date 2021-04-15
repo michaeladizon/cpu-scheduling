@@ -24,8 +24,11 @@ void fcfs(Process p[], int n) {
 			}
 			
 	// compute for waiting time
-	for(i = 0; i < n; i++)
+	for(i = 0; i < n; i++){
 		wt[i] = wt[i-1] + p[i-1].bt;
+		printf("wt[%d] = %d + %d \n", i, i-1, i-1);
+		printf("-> wt[%d] = %d + %d\n\n", i, wt[i-1], p[i-1].bt);
+	}
 	
 	// compute for turnaround time
 	for(i = 0; i < n; i++)
