@@ -9,7 +9,7 @@ typedef struct {
 void fcfs(Process p[], int n) {
 	Process temp;
 	int twt = 0;
-	int st[MAX] = {0}, wt[MAX] = {0}, tat[MAX] = {0};
+	int wt[MAX] = {0}, tat[MAX] = {0};
 	float awt = 0;
 	
 	int i, j;
