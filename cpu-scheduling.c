@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #define MAX 400
 
@@ -115,6 +116,11 @@ int main() {
 	printf("Filename: ");
 	scanf("%s", &filename);
 	fp = fopen(filename, "r");
+	
+	if (fp == NULL) {
+		printf("%s not found.", &filename);
+		exit(EXIT_FAILURE);
+	}
 	
 	while((fscanf(fp, "%d", &num)) != EOF) {
 		arr[i] = num;
