@@ -1,5 +1,3 @@
-#define MAX 100
-
 typedef struct {
     int id;
     int at;
@@ -9,10 +7,17 @@ typedef struct {
 void nsjf(Process p[], int n) {
 	Process temp;
 	int twt = 0, tbt = 0;
-	int st[MAX] = {0}, wt[MAX] = {0}, tat[MAX] = {0};
+	int st[n], wt[n], tat[n];
 	float awt = 0;
 	
 	int i, j, k;
+
+	// initialize st, wt, tat
+	for(i = 0; i < n; i++) {
+		st[i] = 0;
+		wt[i] = 0;
+		tat[i] = 0;
+	}
 	
 	// sort by arrival time
 	for(i = 0; i < n; i++)

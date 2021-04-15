@@ -1,5 +1,3 @@
-#define MAX 100
-
 typedef struct {
     int id;
     int at;
@@ -9,10 +7,16 @@ typedef struct {
 void fcfs(Process p[], int n) {
 	Process temp;
 	int twt = 0;
-	int wt[MAX] = {0}, tat[MAX] = {0};
+	int wt[n], tat[n];
 	float awt = 0;
 	
 	int i, j;
+	
+	// initialize wt and tat
+	for(i = 0; i < n; i++) {
+		wt[i] = 0;
+		tat[i] = 0;
+	}
 	
 	// sort by arrival time
 	for(i = 0; i < n; i++)
