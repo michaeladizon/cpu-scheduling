@@ -12,13 +12,15 @@ typedef struct {
 void sort_arrival (Process P[], int size){
 	Process temp;
 	int i, j;
-	for(i = 0; i < size; i++)
-		for(j = 0; j < size-i-1; j++)
+	for(i = 0; i < size; i++){
+		for(j = 0; j < size-i-1; j++){
 			if(P[j].at > P[j+1].at) {
 				temp = P[j];
 				P[j] = P[j+1];
 				P[j+1] = temp;
 			}
+		}
+	}
 }
 
 //Shortest Job First Pre-Emptive
@@ -26,16 +28,19 @@ void PSJF (Process p[], int n){
 	//declare variables needed for the process
 //	char print_results[n][10][255]; //storage for printing of result
 	
-	int i;
+	int i, j;
 	int total_time = 0; //total processing time
 	int wt[n], tat[n]; //waiting time, turnaround time
 	int total_wait = 0; //totalwaiting time
 	int bt[n]; //burst times
 	int min_burst; //minimum burst time
-	int starts[n], ends[n]; //start and end times (NOTE: THIS IS JUST TEMPORARY FOR NOW)
-	int curr_time;
-	int current_p;
-	int previous_p;
+	int start[n][n];//for storing of start times
+	int end[n][n]; //for storing of end times
+	int curr_time; //current time in the CPU schedule
+	int current_p; //index of the current process
+	int previous_p;//index of the previous process
+	int pCounter[n]; //to be used for the update of index for process
+	int size = 0; // size = pCounter[index]
 	
 	float awt = 0; //average waiting time
 	
@@ -46,8 +51,11 @@ void PSJF (Process p[], int n){
 		temp[i] = p[i];
 		wt[i] = 0;
 		tat[i] = 0;
-		starts[i] = 1000; //garbage
-		ends[i] = 1000; //garbage
+		pCounter[i] = 0;
+		for(j = 0; j < n; j++){
+			start[i][j] = 1000; //garbage value as temp value for the matrices
+			end[i][j] = 1000;
+		}
 	}
 		
 	
@@ -67,7 +75,6 @@ void PSJF (Process p[], int n){
 	    		- update curr_p index based on comparison (UPDATE IF x[curr_p].bt > x[next_p].bt
 	    		- repeat until total burst time
 	    		- IF FULLY BURST:
-	    		
 	    			* get wait time and turnaround time for specific process
 	    			* burst time formula: wt = curr_time - bt - at
 	    			* turnaround time formula: tat = burst time + wait time
@@ -94,14 +101,16 @@ void PSJF (Process p[], int n){
 	}
 	
 	//initialize to first arrived process (initiallizing = current process = previous process)
+	//also add starting time to the start matrix
 	previous_p = 0;
 	current_p = 0;
-	starts[current_p] = 0;
+	start[current_p][0] = 0;
 	
 	//follow start loop
 	for(curr_time = 1; curr_time <= total_time; curr_time++){
 //		printf("curr_time = %d\n", curr_time);
 //		printf("current_p = %d\t\t previous_p = %d\n", current_p, previous_p);
+
 		//if the current process has not fully burst, and arrival time is within the current ms time, we reduce the time left before full burst of the process
 		if(bt[current_p] > 0 && temp[current_p].at <= curr_time){
 //			printf("%d > 0 && %d <= %d\n", bt[current_p], temp[current_p].at, curr_time);
@@ -110,11 +119,34 @@ void PSJF (Process p[], int n){
 			bt[current_p]--;
 //			printf("%d\n", bt[current_p]);
 		}
+		// if curr_p != previous_p, the process has changed; update end of the previous process
+		if(current_p != previous_p){
+			//update end time of the previous process, and increment counter for the process array
+			if ( (end[previous_p][pCounter[previous_p]] == 1000) && (pCounter[previous_p] < n) && (temp[previous_p].bursted != 1) ){
+//				printf("PREVIOUS PROCESS...\n");
+				end[previous_p][pCounter[previous_p]] = curr_time - 1;
+//				printf("end[%d][%d] = %d\n", previous_p, pCounter[previous_p], (curr_time-1));
+				pCounter[previous_p] += 1;
+//				printf("pCounter for P[%d]: %d\n", temp[previous_p].id, pCounter[previous_p]);
+			}
+			
+			//now we place the start time of the current process to the start matrix
+			if(start[current_p][pCounter[current_p]] == 1000){
+				start[current_p][pCounter[current_p]] = curr_time - 1;
+//				printf("start[%d][%d] = %d\n", current_p, pCounter[current_p], (curr_time-1));
+			}
+		}
 		
-		//if index of current process is not equal with the index of the previous process, indicate the split by the start and end time (use char matrix later on)
-//		if(current_p != previous_p){
-//			
-//		}
+		else{
+		//update the end of the current process IF it is fully bursted (in this state, use bt)
+			if( (end[current_p][pCounter[current_p]] == 1000) && (pCounter[current_p] < n) && (bt[current_p] == 0) ){
+//				printf("CURRENT PROCESS...\n");
+				end[current_p][pCounter[current_p]] = curr_time;
+//				printf("end[%d][%d] = %d\n", current_p, pCounter[current_p], (curr_time));
+				pCounter[current_p] += 1;
+//				printf("pCounter for P[%d]: %d\n", temp[current_p].id, pCounter[current_p]);
+			}
+		}
 		
 		//if fully burst, we print start and end time, as well as compute for the waiting time and turnaround time
 		//wait time formula: wt = curr_time - bt - at
@@ -122,14 +154,19 @@ void PSJF (Process p[], int n){
 		if(bt[current_p] <= 0 && temp[current_p].bursted != 1){
 //			printf("finished burst...\n");
 //			printf("%d <= 0\n\n", bt[current_p]);
+			size = pCounter[current_p];
+//			printf("size: %d\n", pCounter[current_p]);
 			temp[current_p].bursted = 1;
-			ends[current_p] = curr_time;
 			wt[current_p] = curr_time - temp[current_p].bt - temp[current_p].at;
 			tat[current_p] = temp[current_p].bt + wt[current_p];
 			total_wait += wt[current_p];
 			
 			printf("P[%d]\n", temp[current_p].id);
-			printf("Start Time: %d End Time: %d\n", starts[current_p], ends[current_p]);
+			for(i = 0; i < size; i++)
+			{
+				printf("Start Time: %d End Time: %d\n", start[current_p][i], end[current_p][i]);
+				
+			}
 			printf("Waiting time: %d\n", wt[current_p]);
 			printf("Turnaround time: %d\n", tat[current_p]);
 			printf("************************************\n");
@@ -155,23 +192,27 @@ void PSJF (Process p[], int n){
 //					printf("%d != %d && %d > %d\n", min_burst, bt[i], min_burst, bt[i]);
 					min_burst = bt[i];
 					current_p = i;
-					
-					if(i == 0 && starts[i] == 1000){
-						starts[i] = curr_time;
-					}
-					
-					else if(starts[i] == 1000 && i == current_p){
-						starts[i] = curr_time;
-//						printf("starts[%d] = %d\n", i, (curr_time));
-					}
+					//printf("starts[%d] = %d\n", i, curr_time);					
+//					if(i == 0 && starts[i][0] == 1000){
+//						starts[i] = curr_time;
+//					}
+//					
+//					else if(starts[i] == 1000 && i == current_p){
+//						starts[i] = curr_time;
+//					}
 				}
 			}
 		}
-		//double sure for loop in case garbage section hindered changing of start time while change of current_p; we exclude i = 0 since we set it from the start (TEMPORARILY)
-		for (i = 1; i < n; i++){
-			if(starts[i] == 1000 && i == current_p)
-				starts[i] = curr_time;
-		}
+//		//double sure for loop in case garbage section hindered changing of start time while change of current_p; we exclude i = 0 since we set it from the start (TEMPORARILY)
+//		for (i = 1; i < n; i++){
+//			if(starts[i] == 1000 && i == current_p)
+//				starts[i] = curr_time;
+//		}
+
+//		for (i = 0; i < n; i++){
+//			printf("Counter for P[%d]: %d\n", temp[i].id, pCounter[i]);
+//		}
+//		
 		
 //		for (i = 0; i < n; i++){
 //				printf("P[%d] = %d\n", temp[i].id, starts[i]);
@@ -179,6 +220,14 @@ void PSJF (Process p[], int n){
 //			
 //		printf("\n");
 	}
+	
+//	for(i = 0; i < n; i++){
+//		printf("P[%d]:\n", temp[i].id);
+//		for (j = 0; j < n; j++){
+//			printf("Start #%d: %d\t", (j+1), start[i][j]);
+//			printf("End #%d: %d\n", (j+1), end[i][j]);
+//		}
+//	}
 	
 	awt = (float)total_wait/n;
 	printf("Average waiting time: %.2f\n", awt);
@@ -196,29 +245,29 @@ int main() {
 	// 4 5 8	- Id no. - at - bt
 	// 5 6 5	- Id no. - at - bt
 
-	test1.id = 2;
-	test1.at = 2;
-	test1.bt = 5;
-	
-	test2.id = 4;
-	test2.at = 5;
-	test2.bt = 8;
-	
-	test3.id = 1;
-	test3.at = 0;
-	test3.bt = 7;
-	
-	test4.id = 5;
-	test4.at = 6;
-	test4.bt = 5;
-	
-	test5.id = 3;
-	test5.at = 3;
-	test5.bt = 3;
-	
-	Process oop1[5] = {test1, test2, test3, test4, test5};	
-	PSJF(oop1, 5);
-	printf("\n");
+//	test1.id = 2;
+//	test1.at = 2;
+//	test1.bt = 5;
+//	
+//	test2.id = 4;
+//	test2.at = 5;
+//	test2.bt = 8;
+//	
+//	test3.id = 1;
+//	test3.at = 0;
+//	test3.bt = 7;
+//	
+//	test4.id = 5;
+//	test4.at = 6;
+//	test4.bt = 5;
+//	
+//	test5.id = 3;
+//	test5.at = 3;
+//	test5.bt = 3;
+//	
+//	Process oop1[5] = {test1, test2, test3, test4, test5};	
+//	PSJF(oop1, 5);
+//	printf("\n");
 
 	test1.id = 2;
 	test1.at = 1;

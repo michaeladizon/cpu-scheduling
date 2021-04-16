@@ -13,7 +13,6 @@ Process		Arrival Time		Burst Time
  --------------------------------------------------
 0      1      6     10     16     24     32        42  
 
-
 waiting time (wt = curr_time - bt - at):
 
 P1: 24-9    = 15
@@ -37,6 +36,30 @@ Average waiting time:
  = 12.1666 ms   -- 12.17 ms
 
 
+current_p  = 0
+previous_p = 0
+
+at curr_time = 1:
+	* 9 > 0 && 0 <= 1 (process has been included in the CPU)
+		* 9 -> 8 (updated burst time of p1)
+	* 0 != 0 (FALSE)
+	* 8 <= 0 && 0 != 1 (F && T -> F)
+	* previous_p = current_p:
+		* previous_p = 0
+		* current_p  = 0
+	* min_burst = 0
+	*for i = 0; i < 6; i++:
+		* 0 <= 1 && 0 != 1 (T && T -> T)
+			* 0 == 0
+				* min_burst = 8
+				* current_p = 0
+	*for i = 1; i < 6; i++:
+		* 1 <= 1 && 0 != 1 (T && T -> T)
+			* 8 == 0 (FALSE)
+			* 8 != 5 && 8 > 5 (T && T -> T)
+				* min_burst = 5
+				* current_p = 1
+
 
 
 Process		Arrival Time		Burst Time
@@ -52,6 +75,13 @@ Process		Arrival Time		Burst Time
 |  P1  |  P3  |  P1  |  P2  |  P5  |  P4  |      
  -----------------------------------------
 0      3      6     10     15     20     28
+
+counter for the processes:
+P1: 2(0 - 3,  6 - 10)
+P2: 1(10 - 15)
+P3: 1(3 - 6)
+P4: 1(20 - 28)
+P5: 1(15 - 20)
 
 waiting time (wt = curr_time - bt - at):
 P1: 6  - 3  = 3 
