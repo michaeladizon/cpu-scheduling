@@ -9,8 +9,15 @@ typedef struct {
     int bursted; // boolean checker if process has fully bursted
 } Process;
 
-void print() {
-	
+void print(Process p[], int st[], int et[], int wt[], int tat[], int n) {
+	int i;
+	for(i = 0; i < n; i++) {
+		printf("P[%d]\n", p[i].id);
+		printf("Start Time: %d End Time: %d\n", st[i], et[i]);
+		printf("Waiting time: %d\n", wt[i]);
+		printf("Turnaround time: %d\n", tat[i]);
+		printf("************************************\n");
+	}
 }
 
 void sort_arrival (Process P[], int size) {
@@ -66,13 +73,7 @@ void fcfs(Process p[], int n) {
 	}
 	
 	// print results
-	for(i = 0; i < n; i++) {
-		printf("P[%d]\n", p[i].id);
-		printf("Start Time: %d End Time: %d\n", st[i], et[i]);
-		printf("Waiting time: %d\n", wt[i]);
-		printf("Turnaround time: %d\n", tat[i]);
-		printf("************************************\n");
-	}
+	print(p, st, et, wt, tat, n);
 	
 	awt = (float)twt/n;
 	printf("Average waiting time: %.2f\n", awt);
@@ -150,13 +151,8 @@ void nsjf(Process p[], int n) {
 		twt += wt[i];
     }
 	
-	for(i = 0; i < n; i++) {
-		printf("P[%d]\n", p[i].id);
-		printf("Start Time: %d End Time: %d\n", st[i], et[i]);
-		printf("Waiting time: %d\n", wt[i]);
-		printf("Turnaround time: %d\n", tat[i]);
-		printf("************************************\n");
-	}
+	// print results
+	print(p, st, et, wt, tat, n);
 	
 	awt = (float)twt/n;
 	printf("Average waiting time: %.2f\n", awt);
