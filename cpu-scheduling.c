@@ -2,6 +2,19 @@
 
 #define MAX 400
 
+// ascii
+#define V 186
+#define H 205
+#define TL 201
+#define TR 187
+#define BL 200
+#define BR 188
+#define M 206
+#define TM 203
+#define LM 204
+#define RM 185
+#define BM 202
+
 typedef struct {
     int id;  // process ID
     int at;  // arrival time
@@ -9,15 +22,103 @@ typedef struct {
     int bursted; // boolean checker if process has fully bursted
 } Process;
 
-void print(Process p[], int st[], int et[], int wt[], int tat[], int n) {
-	int i;
-	for(i = 0; i < n; i++) {
-		printf("P[%d]\n", p[i].id);
-		printf("Start Time: %d End Time: %d\n", st[i], et[i]);
-		printf("Waiting time: %d\n", wt[i]);
-		printf("Turnaround time: %d\n", tat[i]);
-		printf("************************************\n");
+void print_table(Process p[], int st[], int et[], int wt[], int tat[], int twt, int ttt, int n) {
+	int i, j;
+
+	// top border & headings
+	printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c\n",
+			TL, H, H, H, H, H, H, TM, // ID
+			H, H, H, H, H, H, H, H, H, H, H, H, H, H, TM, // AT
+			H, H, H, H, H, H, H, H, H, H, H, H, TM, // BT
+			H, H, H, H, H, H, H, H, H, H, H, H, TM, // ST
+			H, H, H, H, H, H, H, H, H, H, TM, // ET
+			H, H, H, H, H, H, H, H, H, H, H, H, H, H, TM, // WT
+			H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, TR); // TAT
+	printf("%c  ID  %c Arrival Time %c Burst Time %c Start Time %c End Time %c Waiting Time %c Turnaround Time %c\n", V,V,V,V,V,V,V,V);
+	printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c\n",
+			LM, H, H, H, H, H, H, M, // ID
+			H, H, H, H, H, H, H, H, H, H, H, H, H, H, M, // AT
+			H, H, H, H, H, H, H, H, H, H, H, H, M, // BT
+			H, H, H, H, H, H, H, H, H, H, H, H, M, // ST
+			H, H, H, H, H, H, H, H, H, H, M, // ET
+			H, H, H, H, H, H, H, H, H, H, H, H, H, H, M, // WT
+			H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, RM); // TAT
+
+	// print values
+	for(i = 0; i < n; i++)
+		printf("%c  %2d  %c      %2d      %c     %2d     %c     %2d     %c    %2d    %c      %2d      %c       %2d        %c\n",
+			V, p[i].id, V, p[i].at, V, p[i].bt, V, st[i], V, et[i], V, wt[i], V, tat[i], V);
+	
+	// bottom border
+	printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c\n",
+			BL, H, H, H, H, H, H, BM, // ID
+			H, H, H, H, H, H, H, H, H, H, H, H, H, H, BM, // AT
+			H, H, H, H, H, H, H, H, H, H, H, H, BM, // BT
+			H, H, H, H, H, H, H, H, H, H, H, H, BM, // ST
+			H, H, H, H, H, H, H, H, H, H, BM, // ET
+			H, H, H, H, H, H, H, H, H, H, H, H, H, H, BM, // WT
+			H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, BR); // TAT
+
+	// print total and average times
+	float awt = (float)twt/n;
+	float att = (float)ttt/n;
+	printf("\nTotal waiting time: %d\n", twt);
+	printf("Average waiting time: %.2f\n\n", awt);
+	printf("Total Turnaround time: %d\n", ttt);
+	printf("Average waiting time: %.2f\n\n", att);
+}
+
+void print_gantt(Process p[], int st[], int et[], int n) {
+	int i, j;
+
+	printf("Gantt Chart\n");
+
+	// top border
+    printf("%c", TL);
+	for(j = 1; j < p[0].bt; j++) printf("%c%c", H, H);
+	printf("%c%c", H, TM);
+	for(i = 1; i < n; i++) {
+		for(j = 0; j < p[i].bt; j++) printf("%c%c", H, H);
+		printf("%c", H);
+		if(i < n-1) printf("%c", TM);
 	}
+	printf("%c\n", TR);
+
+	// print process IDs
+	printf("%c", V);
+	for(j = 0; j < p[0].bt - 2; j++) printf(" ");
+	printf("%2d", p[0].id);
+	for(j = 0; j < p[0].bt - 1; j++) printf(" ");
+	printf("%c", V);
+
+	for(i = 1; i < n; i++) {
+		for(j = 0; j < p[i].bt - 1; j++) printf(" ");
+		printf("%2d ", p[i].id);
+		for(j = 0; j < p[i].bt - 1; j++) printf(" ");
+		printf("%c", V);
+	}
+	printf("\n");
+
+	// bottom border
+    printf("%c", BL);
+	for(j = 0; j < p[0].bt-1; j++) printf("%c%c", H, H);
+	printf("%c%c", H, BM);
+	for(i = 1; i < n; i++) {
+		for(j = 0; j < p[i].bt; j++) printf("%c%c", H, H);
+		printf("%c", H);
+		if(i < n-1) printf("%c", BM);
+	}
+	printf("%c\n", BR);
+
+	// print start and end times
+	printf("%2d", st[0]);
+	for(j = 0; j < p[0].bt-1; j++) printf("  ");
+	for(i = 1; i < n; i++) {
+		printf("%2d", st[i]);
+		for(j = 0; j < p[i].bt; j++) printf("  ");
+		// printf(" ");
+	}
+	printf("%2d", et[n-1]);
 }
 
 void sort_arrival (Process P[], int size) {
@@ -36,9 +137,8 @@ void sort_arrival (Process P[], int size) {
 
 void fcfs(Process p[], int n) {
 	Process temp;
-	int twt = 0;
+	int twt = 0, ttt = 0;
 	int st[n], et[n], wt[n], tat[n];
-	float awt = 0;
 	
 	int i, j;
 	
@@ -57,6 +157,7 @@ void fcfs(Process p[], int n) {
 	st[0] = p[0].at;
 	et[0] = st[0] + p[0].bt;
 	tat[0] = p[0].bt - p[0].at;
+	ttt += tat[0];
 	for(i = 1; i < n; i++) {
 		st[i] = st[i-1] + p[i-1].bt;
 		et[i] = st[i] + p[i].bt;
@@ -70,20 +171,21 @@ void fcfs(Process p[], int n) {
 		}
 		// total waiting time
 		twt += wt[i];
+		// total turnaround time
+		ttt += tat[i];
 	}
 	
-	// print results
-	print(p, st, et, wt, tat, n);
+	// print table
+	print_table(p, st, et, wt, tat, twt, ttt, n);
 	
-	awt = (float)twt/n;
-	printf("Average waiting time: %.2f\n", awt);
+	// print gantt chart
+	print_gantt(p, st, et, n);
 }
 
 void nsjf(Process p[], int n) {
 	Process temp, t[n];
-	int twt = 0, tbt = 0, same = 1;;
+	int twt = 0, ttt = 0, tbt = 0, same = 1;;
 	int st[n], et[n], wt[n], tat[n];
-	float awt = 0;
 	
 	int i, j, k;
 
@@ -99,22 +201,19 @@ void nsjf(Process p[], int n) {
 	// sort by arrival time
 	sort_arrival(p, n);
 
-	// check if AT is the same for all
-	for(i = 0; i < n; i++) {
-		if(t[0].at != p[i].at)
-			same = 0;
-	}
+	// check if AT is the same for all processes
+	for(i = 0; i < n; i++)
+		if(t[0].at != p[i].at) same = 0;
+	
 	if(same) {
 		// if same, sort by burst time
-		for(i = 0; i < n; i++){
-			for(j = 0; j < n-i-1; j++){
+		for(i = 0; i < n; i++)
+			for(j = 0; j < n-i-1; j++)
 				if(p[j].bt > p[j+1].bt) {
 					temp = p[j];
 					p[j] = p[j+1];
 					p[j+1] = temp;
 				}
-			}
-		}
 	}
 	else {
 		// else, sort by burst time for (arrival < burst)
@@ -135,6 +234,7 @@ void nsjf(Process p[], int n) {
 	// compute for times
 	et[0] = p[0].bt;
 	tat[0] = p[0].bt - p[0].at;
+	ttt += tat[0];
     for(i = 1; i < n; i++) {
         st[i] = st[i-1] + p[i-1].bt;
 		et[i] = st[i] + p[i].bt;
@@ -146,16 +246,17 @@ void nsjf(Process p[], int n) {
 			wt[i] = 0;
 			tat[i] = p[i].bt;
 		}
-		
 		// total waiting time
 		twt += wt[i];
+		// total turnaround time
+		ttt += tat[i];
     }
 	
-	// print results
-	print(p, st, et, wt, tat, n);
-	
-	awt = (float)twt/n;
-	printf("Average waiting time: %.2f\n", awt);
+	// print table
+	print_table(p, st, et, wt, tat, twt, ttt, n);
+
+	// print gantt chart
+	print_gantt(p, st, et, n);
 }
 
 //Shortest Job First Pre-Emptive
@@ -262,7 +363,7 @@ void PSJF (Process p[], int n){
 			wt[current_p] = curr_time - temp[current_p].bt - temp[current_p].at;
 			tat[current_p] = temp[current_p].bt + wt[current_p];
 			total_wait += wt[current_p];
-			
+
 			printf("P[%d]\n", temp[current_p].id);
 			for(i = 0; i < size; i++)
 			{
@@ -334,17 +435,21 @@ int main() {
 	
 	switch(algo) {
 		case 0:
+			printf("\nFirst-Come First-Serve\n");
 			fcfs(p, nProcesses);
 			break;
 		case 1:
+			printf("\nNon-preemptive Shortest-Job First\n");
 			nsjf(p, nProcesses);
 			break;
 		case 2:
+			printf("\nPreemptive Shortest-Job First\n");
 			PSJF(p, nProcesses);
 			break;
-//		case 3:
-//			rr();
-//			break;
+		// case 3:
+		// 	printf("\nRound-Robin\n");
+		// 	rr();
+		// 	break;
 	}
 		
 	return 0;
