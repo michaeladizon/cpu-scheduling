@@ -7,40 +7,53 @@ typedef struct {
 void fcfs(Process p[], int n) {
 	Process temp;
 	int twt = 0;
-	int wt[n], tat[n];
+	int st[n], et[n], wt[n], tat[n];
 	float awt = 0;
 	
 	int i, j;
 	
-	// initialize wt and tat
+	// initialize values
 	for(i = 0; i < n; i++) {
+		st[i] = 0;
+		et[i] = 0;
 		wt[i] = 0;
 		tat[i] = 0;
 	}
 	
 	// sort by arrival time
-	for(i = 0; i < n; i++)
-		for(j = 0; j < n-i-1; j++)
+	for(i = 0; i < n; i++){
+		for(j = 0; j < size-i-1; j++){
 			if(p[j].at > p[j+1].at) {
-				temp = p[j];
-				p[j] = p[j+1];
+				temp = P[j];
+				p[j] = P[j+1];
 				p[j+1] = temp;
 			}
-			
-	// compute for waiting time
-	for(i = 0; i < n; i++)
-		wt[i] = wt[i-1] + p[i-1].bt;
-	
-	// compute for turnaround time
-	for(i = 0; i < n; i++)
+		}
+	}
+
+	// compute for times
+	st[0] = p[0].at;
+	et[0] = st[0] + p[0].bt;
+	tat[0] = p[0].bt - p[0].at;
+	for(i = 1; i < n; i++) {
+		st[i] = st[i-1] + p[i-1].bt;
+		et[i] = st[i] + p[i].bt;
+		wt[i] = st[i] - p[i].at;
 		tat[i] = wt[i] + p[i].bt;
-	
-	for(i = 0; i < n; i++) {
+		if(st[i] < p[i].at) {
+			st[i] = p[i].at;
+			et[i] = st[i] + p[i].bt;
+			wt[i] = 0;
+			tat[i] = p[i].bt;
+		}
 		// total waiting time
 		twt += wt[i];
-		
+	}
+	
+	// print results
+	for(i = 0; i < n; i++) {
 		printf("P[%d]\n", p[i].id);
-		printf("Start Time: %d End Time: %d\n", tat[i-1], tat[i]);
+		printf("Start Time: %d End Time: %d\n", st[i], et[i]);
 		printf("Waiting time: %d\n", wt[i]);
 		printf("Turnaround time: %d\n", tat[i]);
 		printf("************************************\n");
