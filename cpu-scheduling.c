@@ -275,6 +275,7 @@ void PSJF (Process p[], int n){
 	int previous_p;//index of the previous process
 	int pCounter[n]; //to be used for the update of index for process
 	int size = 0; // size = pCounter[index]
+	int nProcessburst = 0; //number of processes bursted
 	
 	float awt = 0; //average waiting time
 	
@@ -300,7 +301,7 @@ void PSJF (Process p[], int n){
 	    
 		- at i = 0: initialize to first process arrived
 	   	- start loop (maybe while or do-while) of processing each time
-	      while i <= total process time: (WE START AT i = 1)
+	      while the number of processes bursted != number of processes:
 	    		- decrement burst time of current process
 	    		- check for new arrivals
 	    		- compare burst time
@@ -324,46 +325,32 @@ void PSJF (Process p[], int n){
 	//also add starting time to the start matrix
 	previous_p = 0;
 	current_p = 0;
-	start[current_p][0] = 0;
+	curr_time = temp[current_p].at + 1;
+	start[current_p][0] = temp[current_p].at;
 	
 	//follow start loop
-	for(curr_time = 1; curr_time <= total_time; curr_time++){
+	while(nProcessburst != n){
 		//if the current process has not fully burst, and arrival time is within the current ms time, we reduce the time left before full burst of the process
 		if(bt[current_p] > 0 && temp[current_p].at <= curr_time){
 			bt[current_p]--;
 		}
-		// if curr_p != previous_p, the process has changed; update end of the previous process
-		if(current_p != previous_p){
-			//update end time of the previous process, and increment counter for the process array
-			if ( (end[previous_p][pCounter[previous_p]] == 1000) && (pCounter[previous_p] < n) && (temp[previous_p].bursted != 1) ){
-				end[previous_p][pCounter[previous_p]] = curr_time - 1;
-				pCounter[previous_p] += 1;
-			}
-			
-			//now we place the start time of the current process to the start matrix
-			if(start[current_p][pCounter[current_p]] == 1000){
-				start[current_p][pCounter[current_p]] = curr_time - 1;
-			}
-		}
 		
-		else{
 		//update the end of the current process IF it is fully bursted (in this state, use bt)
-			if( (end[current_p][pCounter[current_p]] == 1000) && (pCounter[current_p] < n) && (bt[current_p] == 0) ){
-				end[current_p][pCounter[current_p]] = curr_time;
-				pCounter[current_p] += 1;
-			}
+		if( (end[current_p][pCounter[current_p]] == 1000) && (pCounter[current_p] < n) && (bt[current_p] == 0) ){
+			end[current_p][pCounter[current_p]] = curr_time;
+			pCounter[current_p] += 1;
 		}
-		
+	
 		//if fully burst, we print start and end time, as well as compute for the waiting time and turnaround time
-		//wait time formula: wt = curr_time - bt - at
-		//turnaround time formula: tat = burst time + wait time
+		//turnaround time formula: tat = curr_time - arrival time
+		//wait time formula: wt = tat - bt
 		if(bt[current_p] <= 0 && temp[current_p].bursted != 1){
 			size = pCounter[current_p];
 			temp[current_p].bursted = 1;
-			wt[current_p] = curr_time - temp[current_p].bt - temp[current_p].at;
-			tat[current_p] = temp[current_p].bt + wt[current_p];
+			tat[current_p] = curr_time - temp[current_p].at;
+			wt[current_p] = tat[current_p] - temp[current_p].bt;
 			total_wait += wt[current_p];
-
+			
 			printf("P[%d]\n", temp[current_p].id);
 			for(i = 0; i < size; i++)
 			{
@@ -373,6 +360,7 @@ void PSJF (Process p[], int n){
 			printf("Waiting time: %d\n", wt[current_p]);
 			printf("Turnaround time: %d\n", tat[current_p]);
 			printf("************************************\n");
+			nProcessburst++;
 		}
 		
 		//now we update index for current process by checking newly arrived processes and comparing their burst times
@@ -393,6 +381,21 @@ void PSJF (Process p[], int n){
 				}
 			}
 		}
+		
+		// if curr_p != previous_p, the process has changed; update end of the previous process
+		if(current_p != previous_p){
+			//update end time of the previous process, and increment counter for the process array
+			if ( (end[previous_p][pCounter[previous_p]] == 1000) && (pCounter[previous_p] < n) && (temp[previous_p].bursted != 1) ){
+				end[previous_p][pCounter[previous_p]] = curr_time;
+				pCounter[previous_p] += 1;
+			}
+			
+			//now we place the start time of the current process to the start matrix
+			if(start[current_p][pCounter[current_p]] == 1000){
+				start[current_p][pCounter[current_p]] = curr_time;
+			}
+		}
+		curr_time++;
 	}
 	
 	awt = (float)total_wait/n;
