@@ -286,9 +286,12 @@ void PSJF (Process p[], int n){
 	int pCounter[n]; //to be used for the update of index for process
 	int size = 0; // size = pCounter[index]
 	int nProcessburst = 0; //number of processes bursted
-	int cnt = n;
 	
 	float awt = 0; //average waiting time
+	
+	// for printing purposes only (at = st -- bt = et)
+	int cnt = n;
+	Process order[n*n];
 	
 	Process temp[n];
 	
@@ -344,6 +347,8 @@ void PSJF (Process p[], int n){
 	// print table's top border and headings
 	print_top();
 
+	int k = 0;
+
 	//follow start loop
 	while(nProcessburst != n){
 		//if the current process has not fully burst, and arrival time is within the current ms time, we reduce the time left before full burst of the process
@@ -376,22 +381,41 @@ void PSJF (Process p[], int n){
 			else
 				printf("%c  %2d  %c      %2d      %c     %2d     %c     %2d     %c    %2d    %c      %2d      %c       %2d        %c\n",
 						V, temp[current_p].id, V, temp[current_p].at, V, temp[current_p].bt, V, start[current_p][0], V, end[current_p][0], V, wt[current_p], V, tat[current_p], V);
+			
+			order[k].id = temp[current_p].id;
+			order[k].at = start[current_p][0]; // start time
+			order[k].bt = end[current_p][0]; // end time
+			k++;
 
-			for(i = 1; i < size; i++)
+			for(i = 1; i < size; i++) {
 				printf("%c      %c              %c            %c     %2d     %c    %2d    %c      %2d      %c       %2d        %c\n",
 					V, V, V, V, start[current_p][i], V, end[current_p][i], V, wt[current_p], V, tat[current_p], V);
+				order[k].id = temp[current_p].id;
+				order[k].at = start[current_p][i];
+				order[k].bt = end[current_p][i];
+				k++;
+			}
 			
 			nProcessburst++;
+
+			// original printing
+			// printf("P[%d]\n", temp[current_p].id);
+			// for(i = 0; i < size; i++)
+			// 	printf("Start Time: %d End Time: %d\n", start[current_p][i], end[current_p][i]);
+			// printf("Waiting time: %d\n", wt[current_p]);
+			// printf("Turnaround time: %d\n", tat[current_p]);
+			// printf("************************************\n");
+			// nProcessburst++;
 		}
 
 		//now we update index for current process by checking newly arrived processes and comparing their burst times
 		previous_p = current_p; //for splits
-		min_burst = 12345; //garbage value
+		min_burst = -1; //garbage value
 		for (i = 0; i < n; i++){
 			//if arrival time is within the current ms time, it means the process has arrived/just arrived, and is part of comparison
 			if(temp[i].at <= curr_time && temp[i].bursted != 1){
 				//if minimum burst is garbage value, we set a new minimum burst based from previous process
-				if(min_burst == 12345){
+				if(min_burst == -1){
 					min_burst = bt[i];
 					current_p = i;
 				}
@@ -429,17 +453,57 @@ void PSJF (Process p[], int n){
 
 	// print gantt chart
 	printf("Gantt Chart\n");
-	printf("%d blocks\n\n", cnt);
 
-	for(i = 0 ;i < n; i++) {
-		printf("%d ", start[i][0]);
-		for(j = 1; j < n; j++) {
-			if(start[i][j] != -1) {
-				printf("%d ", start[i][j]);
-			}
-		}
+	sort_arrival(order, cnt);
+	// for(i = 0; i < cnt; i++)
+	// 	printf("%d\t%d\t%d\n", order[i].id, order[i].at, order[i].bt);
+	
+	// top border
+    printf("%c", TL);
+	for(j = 1; j < order[0].bt-order[0].at; j++) printf("%c%c", H, H);
+	printf("%c%c", H, TM);
+	for(i = 1; i < cnt; i++) {
+		for(j = 0; j < order[i].bt-order[i].at; j++) printf("%c%c", H, H);
+		printf("%c", H);
+		if(i < cnt-1) printf("%c", TM);
 	}
+	printf("%c\n", TR);
 
+	// print process IDs
+	printf("%c", V);
+	for(j = 0; j < order[0].bt-order[0].at-2; j++) printf(" ");
+	printf("%2d", order[0].id);
+	for(j = 0; j < order[0].bt-order[0].at-1; j++) printf(" ");
+	printf("%c", V);
+
+	for(i = 1; i < cnt; i++) {
+		for(j = 0; j < order[i].bt-order[i].at-1; j++) printf(" ");
+		printf("%2d ", order[i].id);
+		for(j = 0; j < order[i].bt-order[i].at-1; j++) printf(" ");
+		printf("%c", V);
+	}
+	printf("\n");
+
+	// bottom border
+    printf("%c", BL);
+	for(j = 0; j < order[0].bt-order[i].at-1; j++) printf("%c%c", H, H);
+	printf("%c%c", H, BM);
+	for(i = 1; i < cnt; i++) {
+		for(j = 0; j < order[i].bt-order[i].at; j++) printf("%c%c", H, H);
+		printf("%c", H);
+		if(i < cnt-1) printf("%c", BM);
+	}
+	printf("%c\n", BR);
+	
+	// print start and end times
+	printf("%2d", order[0].at);
+	for(j = 0; j < order[0].bt-order[0].at-1; j++) printf("  ");
+	for(i = 1; i < cnt; i++) {
+		printf("%2d", order[i].at);
+		for(j = 0; j < order[i].bt-order[i].at; j++) printf("  ");
+		// printf(" ");
+	}
+	printf("%2d", order[cnt-1].bt);
 }
 
 int main() {
