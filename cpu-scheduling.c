@@ -1,3 +1,10 @@
+/**********************************************
+	Names: 	 Dizon, Michaela Nicole P.
+			 Marasigan, Giann Jericho Mari F.
+	Group:	 39
+	Section: S16
+***********************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 
