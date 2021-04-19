@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #define MAX 400
 
@@ -22,42 +23,51 @@ typedef struct {
     int bursted; // boolean checker if process has fully bursted
 } Process;
 
+void print_top() {
+	// top border
+	printf("%c%c%c%c%c%c%c%c", TL, H, H, H, H, H, H, TM); // ID
+	printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c", H, H, H, H, H, H, H, H, H, H, H, H, H, H, TM); // AT
+	printf("%c%c%c%c%c%c%c%c%c%c%c%c%c", H, H, H, H, H, H, H, H, H, H, H, H, TM); // BT
+	printf("%c%c%c%c%c%c%c%c%c%c%c%c%c", H, H, H, H, H, H, H, H, H, H, H, H, TM); // ST
+	printf("%c%c%c%c%c%c%c%c%c%c%c", H, H, H, H, H, H, H, H, H, H, TM); // ET
+	printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c", H, H, H, H, H, H, H, H, H, H, H, H, H, H, TM); // WT
+	printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c\n", H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, TR); // TAT
+	// headings
+	printf("%c  ID  %c Arrival Time %c Burst Time %c Start Time %c End Time %c Waiting Time %c Turnaround Time %c\n", V,V,V,V,V,V,V,V);
+
+	printf("%c%c%c%c%c%c%c%c", LM, H, H, H, H, H, H, M); // ID
+	printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c", H, H, H, H, H, H, H, H, H, H, H, H, H, H, M); // AT
+	printf("%c%c%c%c%c%c%c%c%c%c%c%c%c", H, H, H, H, H, H, H, H, H, H, H, H, M); // BT
+	printf("%c%c%c%c%c%c%c%c%c%c%c%c%c", H, H, H, H, H, H, H, H, H, H, H, H, M); // ST
+	printf("%c%c%c%c%c%c%c%c%c%c%c", H, H, H, H, H, H, H, H, H, H, M); // ET
+	printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c", H, H, H, H, H, H, H, H, H, H, H, H, H, H, M); // WT
+	printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c\n", H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, RM); // TAT
+}
+
+void print_bottom() {
+	// bottom border
+	printf("%c%c%c%c%c%c%c%c", BL, H, H, H, H, H, H, BM); // ID
+	printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c", H, H, H, H, H, H, H, H, H, H, H, H, H, H, BM); // AT
+	printf("%c%c%c%c%c%c%c%c%c%c%c%c%c", H, H, H, H, H, H, H, H, H, H, H, H, BM); // BT
+	printf("%c%c%c%c%c%c%c%c%c%c%c%c%c", H, H, H, H, H, H, H, H, H, H, H, H, BM); // ST
+	printf("%c%c%c%c%c%c%c%c%c%c%c", H, H, H, H, H, H, H, H, H, H, BM); // ET
+	printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c", H, H, H, H, H, H, H, H, H, H, H, H, H, H, BM); // WT
+	printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c\n", H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, BR); // TAT
+}
+
 void print_table(Process p[], int st[], int et[], int wt[], int tat[], int twt, int ttt, int n) {
 	int i, j;
 
-	// top border & headings
-	printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c\n",
-			TL, H, H, H, H, H, H, TM, // ID
-			H, H, H, H, H, H, H, H, H, H, H, H, H, H, TM, // AT
-			H, H, H, H, H, H, H, H, H, H, H, H, TM, // BT
-			H, H, H, H, H, H, H, H, H, H, H, H, TM, // ST
-			H, H, H, H, H, H, H, H, H, H, TM, // ET
-			H, H, H, H, H, H, H, H, H, H, H, H, H, H, TM, // WT
-			H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, TR); // TAT
-	printf("%c  ID  %c Arrival Time %c Burst Time %c Start Time %c End Time %c Waiting Time %c Turnaround Time %c\n", V,V,V,V,V,V,V,V);
-	printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c\n",
-			LM, H, H, H, H, H, H, M, // ID
-			H, H, H, H, H, H, H, H, H, H, H, H, H, H, M, // AT
-			H, H, H, H, H, H, H, H, H, H, H, H, M, // BT
-			H, H, H, H, H, H, H, H, H, H, H, H, M, // ST
-			H, H, H, H, H, H, H, H, H, H, M, // ET
-			H, H, H, H, H, H, H, H, H, H, H, H, H, H, M, // WT
-			H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, RM); // TAT
+	// print top border and headings
+	print_top();
 
 	// print values
 	for(i = 0; i < n; i++)
 		printf("%c  %2d  %c      %2d      %c     %2d     %c     %2d     %c    %2d    %c      %2d      %c       %2d        %c\n",
 			V, p[i].id, V, p[i].at, V, p[i].bt, V, st[i], V, et[i], V, wt[i], V, tat[i], V);
 	
-	// bottom border
-	printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c\n",
-			BL, H, H, H, H, H, H, BM, // ID
-			H, H, H, H, H, H, H, H, H, H, H, H, H, H, BM, // AT
-			H, H, H, H, H, H, H, H, H, H, H, H, BM, // BT
-			H, H, H, H, H, H, H, H, H, H, H, H, BM, // ST
-			H, H, H, H, H, H, H, H, H, H, BM, // ET
-			H, H, H, H, H, H, H, H, H, H, H, H, H, H, BM, // WT
-			H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, BR); // TAT
+	// print bottom border
+	print_bottom();
 
 	// print total and average times
 	float awt = (float)twt/n;
@@ -276,6 +286,7 @@ void PSJF (Process p[], int n){
 	int pCounter[n]; //to be used for the update of index for process
 	int size = 0; // size = pCounter[index]
 	int nProcessburst = 0; //number of processes bursted
+	int cnt = n;
 	
 	float awt = 0; //average waiting time
 	
@@ -288,8 +299,8 @@ void PSJF (Process p[], int n){
 		tat[i] = 0;
 		pCounter[i] = 0;
 		for(j = 0; j < n; j++){
-			start[i][j] = 1000; //garbage value as temp value for the matrices
-			end[i][j] = 1000;
+			start[i][j] = -1; //garbage value as temp value for the matrices
+			end[i][j] = -1;
 		}
 	}
 	/*
@@ -314,7 +325,9 @@ void PSJF (Process p[], int n){
 	    			* print alongside with start time and end times (FURTHER BRAINSTORMING)
 	*/
 	// sort by arrival time
+
 	sort_arrival(temp, n);
+	
 	for(i = 0; i < n; i++){
 		//assign burst time of each process to burst time array (following ordered processes by a.t) & compute total process time / total burst time 
 		bt[i] = temp[i].bt;
@@ -328,6 +341,9 @@ void PSJF (Process p[], int n){
 	curr_time = temp[current_p].at + 1;
 	start[current_p][0] = temp[current_p].at;
 	
+	// print table's top border and headings
+	print_top();
+
 	//follow start loop
 	while(nProcessburst != n){
 		//if the current process has not fully burst, and arrival time is within the current ms time, we reduce the time left before full burst of the process
@@ -336,7 +352,7 @@ void PSJF (Process p[], int n){
 		}
 		
 		//update the end of the current process IF it is fully bursted (in this state, use bt)
-		if( (end[current_p][pCounter[current_p]] == 1000) && (pCounter[current_p] < n) && (bt[current_p] == 0) ){
+		if( (end[current_p][pCounter[current_p]] == -1) && (pCounter[current_p] < n) && (bt[current_p] == 0) ){
 			end[current_p][pCounter[current_p]] = curr_time;
 			pCounter[current_p] += 1;
 		}
@@ -350,19 +366,24 @@ void PSJF (Process p[], int n){
 			tat[current_p] = curr_time - temp[current_p].at;
 			wt[current_p] = tat[current_p] - temp[current_p].bt;
 			total_wait += wt[current_p];
-			
-			printf("P[%d]\n", temp[current_p].id);
-			for(i = 0; i < size; i++)
-			{
-				printf("Start Time: %d End Time: %d\n", start[current_p][i], end[current_p][i]);
-				
+
+			// print values in table
+			if(size > 1) {
+				cnt++;
+				printf("%c  %2d  %c      %2d      %c     %2d     %c     %2d     %c    %2d    %c              %c                 %c\n",
+						V, temp[current_p].id, V, temp[current_p].at, V, temp[current_p].bt, V, start[current_p][0], V, end[current_p][0], V, V, V);
 			}
-			printf("Waiting time: %d\n", wt[current_p]);
-			printf("Turnaround time: %d\n", tat[current_p]);
-			printf("************************************\n");
+			else
+				printf("%c  %2d  %c      %2d      %c     %2d     %c     %2d     %c    %2d    %c      %2d      %c       %2d        %c\n",
+						V, temp[current_p].id, V, temp[current_p].at, V, temp[current_p].bt, V, start[current_p][0], V, end[current_p][0], V, wt[current_p], V, tat[current_p], V);
+
+			for(i = 1; i < size; i++)
+				printf("%c      %c              %c            %c     %2d     %c    %2d    %c      %2d      %c       %2d        %c\n",
+					V, V, V, V, start[current_p][i], V, end[current_p][i], V, wt[current_p], V, tat[current_p], V);
+			
 			nProcessburst++;
 		}
-		
+
 		//now we update index for current process by checking newly arrived processes and comparing their burst times
 		previous_p = current_p; //for splits
 		min_burst = 12345; //garbage value
@@ -385,22 +406,40 @@ void PSJF (Process p[], int n){
 		// if curr_p != previous_p, the process has changed; update end of the previous process
 		if(current_p != previous_p){
 			//update end time of the previous process, and increment counter for the process array
-			if ( (end[previous_p][pCounter[previous_p]] == 1000) && (pCounter[previous_p] < n) && (temp[previous_p].bursted != 1) ){
+			if ( (end[previous_p][pCounter[previous_p]] == -1) && (pCounter[previous_p] < n) && (temp[previous_p].bursted != 1) ){
 				end[previous_p][pCounter[previous_p]] = curr_time;
 				pCounter[previous_p] += 1;
 			}
 			
 			//now we place the start time of the current process to the start matrix
-			if(start[current_p][pCounter[current_p]] == 1000){
+			if(start[current_p][pCounter[current_p]] == -1){
 				start[current_p][pCounter[current_p]] = curr_time;
 			}
 		}
 		curr_time++;
 	}
 	
+	// print table's bottom border
+	print_bottom();
+
+	// print average waiting time
 	awt = (float)total_wait/n;
-	printf("Average waiting time: %.2f\n", awt);
-	
+	printf("\nTotal waiting time: %d\n", total_wait);
+	printf("Average waiting time: %.2f\n\n", awt);
+
+	// print gantt chart
+	printf("Gantt Chart\n");
+	printf("%d blocks\n\n", cnt);
+
+	for(i = 0 ;i < n; i++) {
+		printf("%d ", start[i][0]);
+		for(j = 1; j < n; j++) {
+			if(start[i][j] != -1) {
+				printf("%d ", start[i][j]);
+			}
+		}
+	}
+
 }
 
 int main() {
@@ -414,6 +453,11 @@ int main() {
 	scanf("%s", &filename);
 	fp = fopen(filename, "r");
 	
+	if(fp == NULL) {
+		printf("%s not found.", &filename);
+		exit(EXIT_FAILURE);
+	}
+
 	while((fscanf(fp, "%d", &num)) != EOF) {
 		arr[i] = num;
 		i++;
