@@ -23,6 +23,7 @@ typedef struct {
     int bursted; // boolean checker if process has fully bursted
 } Process;
 
+// displays the process table's top border and headings
 void print_top() {
 	// top border
 	printf("%c%c%c%c%c%c%c%c", TL, H, H, H, H, H, H, TM); // ID
@@ -44,6 +45,7 @@ void print_top() {
 	printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c\n", H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, RM); // TAT
 }
 
+// displays the process table's bottom border
 void print_bottom() {
 	// bottom border
 	printf("%c%c%c%c%c%c%c%c", BL, H, H, H, H, H, H, BM); // ID
@@ -55,6 +57,7 @@ void print_bottom() {
 	printf("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c\n", H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, H, BR); // TAT
 }
 
+// displays a table containing the details of each process
 void print_table(Process p[], int st[], int et[], int wt[], int tat[], int twt, int ttt, int n) {
 	int i, j;
 
@@ -78,6 +81,7 @@ void print_table(Process p[], int st[], int et[], int wt[], int tat[], int twt, 
 	printf("Average waiting time: %.2f\n\n", att);
 }
 
+// displays a visual representation of the order of processes
 void print_gantt(Process p[], int st[], int et[], int n) {
 	int i, j;
 
@@ -131,6 +135,7 @@ void print_gantt(Process p[], int st[], int et[], int n) {
 	printf("%2d", et[n-1]);
 }
 
+// sorts processes by arrival time
 void sort_arrival (Process P[], int size) {
 	Process temp;
 	int i, j;
@@ -145,6 +150,7 @@ void sort_arrival (Process P[], int size) {
 	}
 }
 
+// First-Come First-Serve
 void fcfs(Process p[], int n) {
 	Process temp;
 	int twt = 0, ttt = 0;
@@ -192,6 +198,7 @@ void fcfs(Process p[], int n) {
 	print_gantt(p, st, et, n);
 }
 
+// Non-preemptive Shortest-Job First
 void nsjf(Process p[], int n) {
 	Process temp, t[n];
 	int twt = 0, ttt = 0, tbt = 0, same = 1;;
@@ -269,7 +276,7 @@ void nsjf(Process p[], int n) {
 	print_gantt(p, st, et, n);
 }
 
-//Shortest Job First Pre-Emptive
+// Preemptive Shortest-Job First
 void PSJF (Process p[], int n){
 	//declare variables needed for the process
 	int i, j;
@@ -327,8 +334,8 @@ void PSJF (Process p[], int n){
 	    			* turnaround time formula: tat = burst time + wait time
 	    			* print alongside with start time and end times (FURTHER BRAINSTORMING)
 	*/
-	// sort by arrival time
 
+	// sort by arrival time
 	sort_arrival(temp, n);
 	
 	for(i = 0; i < n; i++){
@@ -455,12 +462,11 @@ void PSJF (Process p[], int n){
 	printf("Gantt Chart\n");
 
 	sort_arrival(order, cnt);
-	// for(i = 0; i < cnt; i++)
-	// 	printf("%d\t%d\t%d\n", order[i].id, order[i].at, order[i].bt);
 	
 	// top border
     printf("%c", TL);
 	for(j = 1; j < order[0].bt-order[0].at; j++) printf("%c%c", H, H);
+	if(order[0].bt-order[0].at <= 1) printf("%c%c", H, H);
 	printf("%c%c", H, TM);
 	for(i = 1; i < cnt; i++) {
 		for(j = 0; j < order[i].bt-order[i].at; j++) printf("%c%c", H, H);
@@ -473,6 +479,7 @@ void PSJF (Process p[], int n){
 	printf("%c", V);
 	for(j = 0; j < order[0].bt-order[0].at-2; j++) printf(" ");
 	printf("%2d", order[0].id);
+	if(order[0].bt-order[0].at-2 < 0) printf(" ");
 	for(j = 0; j < order[0].bt-order[0].at-1; j++) printf(" ");
 	printf("%c", V);
 
@@ -486,7 +493,8 @@ void PSJF (Process p[], int n){
 
 	// bottom border
     printf("%c", BL);
-	for(j = 0; j < order[0].bt-order[i].at-1; j++) printf("%c%c", H, H);
+	for(j = 0; j < order[0].bt-order[0].at-1; j++) printf("%c%c", H, H);
+	if(order[0].bt-order[0].at <= 1) printf("%c%c", H, H);
 	printf("%c%c", H, BM);
 	for(i = 1; i < cnt; i++) {
 		for(j = 0; j < order[i].bt-order[i].at; j++) printf("%c%c", H, H);
@@ -501,7 +509,6 @@ void PSJF (Process p[], int n){
 	for(i = 1; i < cnt; i++) {
 		printf("%2d", order[i].at);
 		for(j = 0; j < order[i].bt-order[i].at; j++) printf("  ");
-		// printf(" ");
 	}
 	printf("%2d", order[cnt-1].bt);
 }
