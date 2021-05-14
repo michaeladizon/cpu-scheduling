@@ -836,13 +836,15 @@ int main() {
 	}
 	
 	// validate tSlice (min = 1 || max = 100)
-	if(tSlice < 1) {
-		printf("Time slice should have a minimum value of 1.\n");
-		error = 1;
-	}
-	if(tSlice > 100) {
-		printf("Time slice cannot exceed 100.\n");
-		error = 1;
+	if(algo == 3) {
+		if(tSlice < 1) {
+			printf("Time slice should have a minimum value of 1.\n");
+			error = 1;
+		}
+		if(tSlice > 100) {
+			printf("Time slice cannot exceed 100.\n");
+			error = 1;
+		}
 	}
 	
 	// validate nProcs (min = 3 || max = 100)
