@@ -800,6 +800,8 @@ int main() {
 	nProcesses = arr[1];
 	tSlice = arr[2];
 	
+	int max = 3 + 3*nProcesses;
+	
 	// store inputs in a Process array
 	for(i = 3; i < n; i+=3) {
 		p[j].id = arr[i];
@@ -808,23 +810,80 @@ int main() {
 		j++;
 	}
 	
-	switch(algo) {
-		case 0:
-			printf("\nFirst-Come First-Serve\n");
-			fcfs(p, nProcesses);
+	int error = 0;
+	
+	// if the number of inputs does not match the expected # of inputs
+	if(n != max) {
+		printf("Incomplete input.\n");
+		error = 1;
+	}
+	
+	// check for negative inputs
+	if(algo < 0 || nProcesses < 0 || tSlice < 0) error = 2;
+	for(i = 0; i < nProcesses; i++) {
+		if(p[i].id < 0 || p[i].at < 0 || p[i].bt < 0) {
+			error = 2;
 			break;
-		case 1:
-			printf("\nNon-preemptive Shortest-Job First\n");
-			nsjf(p, nProcesses);
-			break;
-		case 2:
-			printf("\nPreemptive Shortest-Job First\n");
-			PSJF(p, nProcesses);
-			break;
-		 case 3:
-		 	printf("\nRound-Robin\n");
-		 	RR(p, nProcesses, tSlice);
-		 	break;
+		}
+	}
+	
+	if(error == 2) printf("Negative inputs are invalid.\n");
+	
+	// validate algo input (valid inputs: 0,1,2,3)
+	if(algo < 0 || algo > 4) {
+		printf("Please input a valid algorithm.\n");
+		error = 1;
+	}
+	
+	// validate tSlice (min = 1 || max = 100)
+	if(tSlice < 1) {
+		printf("Time slice should have a minimum value of 1.\n");
+		error = 1;
+	}
+	if(tSlice > 100) {
+		printf("Time slice cannot exceed 100.\n");
+		error = 1;
+	}
+	
+	// validate nProcs (min = 3 || max = 100)
+	if(nProcesses < 3) {
+		printf("Please input at least 3 processes.\n");
+		error = 1;
+	}
+	if(nProcesses > 100) {
+		printf("There can only be up to 100 processes.\n");
+		error = 1;
+	}
+	
+	// check Process IDs
+	for(i = 0; i < nProcesses; i++)
+		for(j = i + 1; j < nProcesses; j++)
+			if(p[i].id == p[j].id) {
+				error = 3;
+				break;
+			}
+			
+	if(error == 3) printf("Process IDs should be unique.\n");
+	
+	if(error == 0) {
+		switch(algo) {
+			case 0:
+				printf("\nFirst-Come First-Serve\n");
+				fcfs(p, nProcesses);
+				break;
+			case 1:
+				printf("\nNon-preemptive Shortest-Job First\n");
+				nsjf(p, nProcesses);
+				break;
+			case 2:
+				printf("\nPreemptive Shortest-Job First\n");
+				PSJF(p, nProcesses);
+				break;
+			 case 3:
+			 	printf("\nRound-Robin\n");
+			 	RR(p, nProcesses, tSlice);
+			 	break;
+		}
 	}
 		
 	return 0;
